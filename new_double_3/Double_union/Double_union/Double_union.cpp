@@ -89,11 +89,11 @@ public:
 
         if ((D.exp) < difmin)
         {
-            D.f = INFINITY * (0.5-D.sign);
+            D.f = NULL * (0.5-D.sign);
         }
         else if ((D.exp)>difmax)
         {
-            D.f = NULL * (0.5 - D.sign);
+            D.f = INFINITY * (0.5 - D.sign);
         }
 
     }
@@ -118,6 +118,5 @@ public:
 
 int main()
 {
-
 
 }
