@@ -1,12 +1,13 @@
 ﻿#include <iostream>
-
-using namespace std;
+#include <climits>
+using std::cout;
+using std::endl;
 
 
 union Dbl
 {
     double f;
-    struct 
+    struct
     {
         uint64_t man : 52;
         uint64_t exp : 11;
@@ -15,16 +16,21 @@ union Dbl
 };
 
 
-template<int e,int m>
+template<int e, int m>
 class DOUBLE
 {
 private:
-    Dbl D;
+
 public:
-    long long int get_mask()
+
+    Dbl D;
+
+    unsigned long long int get_mask()
     {
-        long long int mask = ((1 << (m + 12)) - 1);
-        mask = mask << (64 - (m + 12));
+        unsigned long long int one = 1;
+        unsigned long long int mask = (((one << (m + 11)) - 1) << 1) + 1;
+        mask = mask << (52 - m);
+
         return mask;
     }
 
@@ -35,7 +41,7 @@ public:
     DOUBLE(const double& a)
     {
         D.f = a;
-        D.man &= get_mask();
+        CHECK_EXP_AND_MAN();
     }
     DOUBLE(const DOUBLE& a)
     {
@@ -51,54 +57,57 @@ public:
     {
         DOUBLE res(*this);
         res.D.f += a.D.f;
-        res.D.man &= get_mask();
-        res.Check_exp();
+        res.CHECK_EXP_AND_MAN();
         return res;
     }
     DOUBLE operator-(const DOUBLE& a)
     {
         DOUBLE res(*this);
         res.D.f -= a.D.f;
-        res.D.man &= get_mask();
-        res.Check_exp();
+        res.CHECK_EXP_AND_MAN();
         return res;
     }
     DOUBLE operator*(const DOUBLE& a)
     {
         DOUBLE res(*this);
         res.D.f *= a.D.f;
-        res.D.man &= get_mask();
-        res.Check_exp();
+        res.CHECK_EXP_AND_MAN();
         return res;
     }
     DOUBLE operator/(const DOUBLE& a)
     {
         DOUBLE res(*this);
         res.D.f /= a.D.f;
-        res.D.man &= get_mask();
-        res.Check_exp();
+        res.CHECK_EXP_AND_MAN();
         return res;
     }
 
-
-
-    void Check_exp()
+    bool Check_expMAX()
     {
-        int difmin = 1023 - ((1 << (e-1)) - 1), difmax = 1023 - (difmin - 1023)+1;
-
-
-        if ((D.exp) < difmin)
-        {
-            D.f = NULL * (0.5-D.sign);
-        }
-        else if ((D.exp)>difmax)
-        {
-            D.f = INFINITY * (0.5 - D.sign);
-        }
-
+        return ((1024 + ((1 << (e - 1)) - 1)) >= D.exp);
+    }
+    bool Check_expMIN()
+    {
+        return ((1023 - ((1 << (e - 1)) - 1)) <= D.exp);
+    }
+    double EXP_CHECK()
+    {
+        return (double)Check_expMAX() * (double)Check_expMIN() * D.f + (double)!(Check_expMIN()) * NULL;
+    }
+    void special_infinity_check()
+    {
+        D.man |= (ULLONG_MAX << 12) * !(Check_expMAX());
+        D.exp |= ((1 << 11) - 1) * (unsigned long long int)!(Check_expMAX());
     }
 
 
+
+    void CHECK_EXP_AND_MAN()
+    {
+        special_infinity_check();
+        D.f = EXP_CHECK();
+        D.man &= get_mask();
+    }
 
 
     void get_double()
@@ -115,8 +124,8 @@ public:
 
 
 
-
 int main()
 {
-
+    DOUBLE<11, 52> a(0.628);
+    a.get_double();
 }
