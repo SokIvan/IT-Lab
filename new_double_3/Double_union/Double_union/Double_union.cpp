@@ -1,7 +1,16 @@
 ﻿#include <iostream>
 #include <climits>
+#include <float.h>
+#include <exception>
+#include <cmath>
+
 using std::cout;
 using std::endl;
+
+using std::isinf;
+
+using std::invalid_argument;
+
 
 
 union Dbl
@@ -10,7 +19,7 @@ union Dbl
     struct
     {
         uint64_t man : 52;
-        uint64_t exp : 11;
+        uint64_t ex : 11;
         uint64_t sign : 1;
     };
 };
@@ -63,6 +72,7 @@ public:
     DOUBLE operator-(const DOUBLE& a)
     {
         DOUBLE res(*this);
+        if (isinf(res.D.f) && isinf(a.D.f) && res.D.sign == a.D.sign) throw  invalid_argument("Attempted to substract Infinity and Infinity\n");
         res.D.f -= a.D.f;
         res.CHECK_EXP_AND_MAN();
         return res;
@@ -70,6 +80,7 @@ public:
     DOUBLE operator*(const DOUBLE& a)
     {
         DOUBLE res(*this);
+        if (isinf(res.D.f) && a.D.f == 0.0 || isinf(a.D.f) && res.D.f == 0.0) throw  invalid_argument("Attempted to multiplicate Zero and Infinity\n");
         res.D.f *= a.D.f;
         res.CHECK_EXP_AND_MAN();
         return res;
@@ -77,6 +88,7 @@ public:
     DOUBLE operator/(const DOUBLE& a)
     {
         DOUBLE res(*this);
+        if (a.D.f == 0.0) throw  invalid_argument("Attempted to divide by Zero\n");
         res.D.f /= a.D.f;
         res.CHECK_EXP_AND_MAN();
         return res;
@@ -84,29 +96,26 @@ public:
 
     bool Check_expMAX()
     {
-        return ((1024 + ((1 << (e - 1)) - 1)) >= D.exp);
+        return ((1024 + ((1 << (e - 1)) - 1)) >= D.ex);
     }
     bool Check_expMIN()
     {
-        return ((1023 - ((1 << (e - 1)) - 1)) <= D.exp);
-    }
-    double EXP_CHECK()
-    {
-        return (double)Check_expMAX() * (double)Check_expMIN() * D.f + (double)!(Check_expMIN()) * NULL;
-    }
-    void special_infinity_check()
-    {
-        D.man |= (ULLONG_MAX << 12) * !(Check_expMAX());
-        D.exp |= ((1 << 11) - 1) * (unsigned long long int)!(Check_expMAX());
+        return ((1023 - ((1 << (e - 1)) - 1)) <= D.ex);
     }
 
+    void special_infinity_and_null_check()
+    {
+        D.man &= (get_mask() * Check_expMAX());
+        D.ex |= ((1 << 11) - 1) * (unsigned long long int)!(Check_expMAX());
 
+        D.man &= (get_mask() * Check_expMIN());
+        D.ex &= ((1 << 11) - 1) * (unsigned long long int)(Check_expMIN());
+    }
 
     void CHECK_EXP_AND_MAN()
     {
-        special_infinity_check();
-        D.f = EXP_CHECK();
-        D.man &= get_mask();
+        special_infinity_and_null_check();
+
     }
 
 
@@ -114,7 +123,7 @@ public:
     {
         cout << "Double: " << D.f << endl;
         cout << "sign: " << D.sign << endl;
-        cout << "exp: " << D.exp << endl;
+        cout << "exp: " << D.ex << endl;
         cout << "mantissa: " << D.man << endl;
     }
 
@@ -126,6 +135,5 @@ public:
 
 int main()
 {
-    DOUBLE<11, 52> a(0.628);
-    a.get_double();
+
 }
