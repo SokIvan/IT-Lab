@@ -118,7 +118,7 @@ public:
 
 
 
-    Floating_Point exp_function(size_t n) // n - количество элементов ряда 
+    Floating_Point exp_function(size_t n) // n - ammount of elements in Mcloren
     {
         Floating_Point a(*this);
         a = a * log2(exp(1.0));
@@ -156,11 +156,11 @@ public:
     Floating_Point Log2(Floating_Point& a)
     {
         Floating_Point q(a);
-        double n1 = log2(1.5); // логарифм числа 1.5 по основанию 2
-        double n2 = log(2); // логарифм числа 2 по основанию e
+        double n1 = log2(1.5); 
+        double n2 = log(2); 
         q.D.f = q.D.f / (2 << (q.D.ex - 1023 - 1));
         q.D.f = q.D.f / 1.5;
-        q.D.f = q.D.f - 1.0;                                        //                                       log2(y)= ln(y)/ln(2)         ln(1+x)=x - x^2/2 + x^3/3 - ...             
+        q.D.f = q.D.f - 1.0;                                       
         Floating_Point mclrn = q.D.f;
         Floating_Point blog = q.D.f;
         Floating_Point alog;
@@ -172,7 +172,7 @@ public:
         }
 
 
-        a =  (mclrn) / n2  + n1+ (a.D.ex - 1023); // ( x - x^2/2 + x^3/3 - ... + x^7/7)/ln(2) + log2(1.5) + exp - (погрешность) .   x = ((исходное число)/(2^exp))/1.5 - 1 .
+        a =  (mclrn) / n2  + n1+ (a.D.ex - 1023); 
 
         return a;
     }
@@ -192,7 +192,7 @@ public:
 
     Floating_Point LogE(Floating_Point& a)
     {
-        Floating_Point expanenta = 2.7182818284;
+        Floating_Point expanenta = exp(1);
         a = Log2(a) / Log2(expanenta);
         return a;
     }
