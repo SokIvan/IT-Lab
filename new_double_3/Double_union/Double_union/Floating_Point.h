@@ -1,8 +1,11 @@
+#define _USE_MATH_DEFINES
+
 #include <iostream>
 #include <climits>
 #include <float.h>
 #include <exception>
 #include <cmath>
+
 
 using std::cout;
 using std::endl;
@@ -122,7 +125,7 @@ public:
     {
         Floating_Point a(*this);
         a = a * log2(exp(1.0));
-        int ipart = FLOOR(a+0.5);
+        int ipart = ROUND(a+0.5);
         Floating_Point fpart = (a.D.f - ipart)* log(2.0);//x*ln2
         Floating_Point last = 1.0,next;
         a = last;
@@ -200,12 +203,12 @@ public:
 };
 
 template<int e,int m>
-int FLOOR(Floating_Point<e,m> a)
+int ROUND(Floating_Point<e,m> a)
 {
-    return floor(a.D.f+0.5);
+    return round(a.D.f);
 }
 template<int e, int m>
-Floating_Point<e, m> MY_FMA(Floating_Point<e, m>& a, Floating_Point<e, m>& b, Floating_Point<e, m>& c)
+Floating_Point<e, m> MY_FMA(Floating_Point<e, m> a, Floating_Point<e, m> b, Floating_Point<e, m>& c)
 {
     return a * b + c;
 }
