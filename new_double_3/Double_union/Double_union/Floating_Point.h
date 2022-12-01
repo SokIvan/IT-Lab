@@ -7,6 +7,7 @@
 #include <cmath>
 
 
+
 using std::cout;
 using std::endl;
 
@@ -202,13 +203,31 @@ public:
 
 };
 
-template<int e,int m>
-int ROUND(Floating_Point<e,m> a)
+template<int e, int m>
+int ROUND(Floating_Point<e, m> &a)
 {
     return round(a.D.f);
+}
+template<int e, int m>
+int CEIL(Floating_Point<e, m> &a)
+{
+    return ROUND(a+0.5);
+}
+template<int e, int m>
+int FLOOR(Floating_Point<e, m> &a)
+{
+    return a.D.f;
+}
+template<int e,int m>
+Floating_Point<e, m> ABSOLUTE(Floating_Point<e, m> a)
+{
+    a.D.sign = 0;
+    return a.D.f;
 }
 template<int e, int m>
 Floating_Point<e, m> MY_FMA(Floating_Point<e, m> a, Floating_Point<e, m> b, Floating_Point<e, m>& c)
 {
     return a * b + c;
 }
+
+
