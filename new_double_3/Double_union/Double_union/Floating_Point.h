@@ -201,10 +201,18 @@ public:
         return a;
     }
 
+
+
+
+
+
+
+
+
 };
 
 template<int e, int m>
-int ROUND(Floating_Point<e, m> &a)
+int ROUND(Floating_Point<e, m> a)
 {
     return round(a.D.f);
 }
